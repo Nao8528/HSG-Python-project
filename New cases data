@@ -64,7 +64,7 @@ cantons_namelist = ["GR", "BE", "AG", "AI", "AR", "BL", "BS", "FR", "GE", "GL", 
 # first-merge all data by "ncumul_conf"
 for i in range(0, len(cantons)):
     cantons[i].index = cantons[i]["date"]
-    Confirmed_cases=pd.DataFrame(np.random.randn(264,1),index=GR.index)
+    Confirmed_cases=pd.DataFrame(np.random.randn(len(GR.index), 1),index=GR.index)
 
 for i in range(0, len(cantons)):
     Confirmed_cases = pd.merge(Confirmed_cases, cantons[i]["ncumul_conf"].to_frame(), on="date", how="left")
