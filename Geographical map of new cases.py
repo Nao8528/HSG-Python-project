@@ -93,12 +93,19 @@ coordinates_cantons=pd.DataFrame(index=cantons_namelist)
 coordinates_cantons["latitude"]=latitude_cantons
 coordinates_cantons["longitude"]=longitude_cantons
 
-# plot the map
+# get new corona cases over the last day for each canton
 today=new_confirmed_cases.iloc[-1]
 
+# create a map of Switzerland
+map=folium.Map(location=[46.8131873, 8.22421], tiles="cartodbpositron", zoom_start=8)
 
-map=folium.Map(location=[46.8131873, 8.22421], tiles="cartodbpositron", zoom_start=8, titel="New Corona Cases in Switzerland")
+# add titel to the map
+titel_html="""<h3 align="center" style="font-size:20px"><b>New Corona Cases in Switzerland over the last day</b></h3>"""
+map.get_root().html.add_child(folium.Element(titel_html))
 
+# add the new corona cases over the last day for each canton to the map
 for i in range(0, len(cantons)):
     folium.CircleMarker(location=[coordinates_cantons.iloc[i]["latitude"], coordinates_cantons.iloc[i]["longitude"]], radius=(today.iloc[i]/20), popup=today.index[i]+": " +str(today[i]), color="#cc4131", fill=True, fill_color="#cc4131").add_to(map)
-map.save("map.html")
+
+# save the map as html file "new_corona_cases_map.html" in the project
+map.save("new_corona_cases_map.html")
