@@ -109,5 +109,5 @@ map.get_root().html.add_child(folium.Element(titel_html))
 for i in range(0, len(cantons)):
     folium.CircleMarker(location=[coordinates_cantons.iloc[i]["latitude"], coordinates_cantons.iloc[i]["longitude"]], radius=(today.iloc[i]/20), popup=today.index[i]+": " +str(today[i]), color="#cc4131", fill=True, fill_color="#cc4131").add_to(map)
 
-# save the map as html file named "Map of New Cases per Canton.html" in the project
-map.save("Map of New Cases per Canton.html")
+# save the map as html file named "Geographical map of new cases visualization.html" in the project
+map.save("Geographical map of new cases visualization.html")
