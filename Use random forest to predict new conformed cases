@@ -11,7 +11,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import classification_report,confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
-from sklearn import  ensemble, preprocessing, metrics
+from sklearn import ensemble, preprocessing, metrics
 
 #Import all datas
 AG=pd.read_csv("https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_kanton_total_csv_v2/COVID19_Fallzahlen_Kanton_AG_total.csv")
@@ -48,7 +48,7 @@ cantons_namelist=["GE","GR","BE","AG","AI","AR","BL","BS","FR","GL","JU","LU","N
 #first-merge all data by "ncumul_conf"
 for i in range(0,len(cantons)):
     cantons[i].index=cantons[i]["date"]
-Confirmed_cases=pd.DataFrame(np.random.randn(len(GE.index),1),index=GE.index)
+    Confirmed_cases=pd.DataFrame(np.random.randn(len(GE.index),1),index=GE.index)
 
 for i in range(0,len(cantons)):
     Confirmed_cases=pd.merge(Confirmed_cases,cantons[i]["ncumul_conf"].to_frame(),on="date",how="left")
@@ -64,7 +64,7 @@ new_confirmed_cases=Confirmed_cases.diff()
 
 for i in range(0,len(cantons)):
     cantons[i].index=cantons[i]["date"]
-recover=pd.DataFrame(np.random.randn(len(GE.index),1),index=GE.index)
+    recover=pd.DataFrame(np.random.randn(len(GE.index),1),index=GE.index)
 
 for i in range(0,len(cantons)):
     recover=pd.merge(recover,cantons[i]["ncumul_released"].to_frame(),on="date",how="left")
@@ -119,3 +119,4 @@ plt.xticks(rotation=45)
 plt.title("Actual vs Predtictions",fontsize=15)
 plt.legend()
 plt.grid()
+plt.show()
