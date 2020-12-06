@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 import folium
+from folium import plugins
 
 # Before visualizing, the corona data needs to be collected
 # import all corona data for each canton
@@ -105,9 +106,10 @@ map=folium.Map(location=[46.8131873, 8.22421], tiles="cartodbpositron", zoom_sta
 titel_html="""<h3 align="center" style="font-size:20px"><b>New Corona Cases in Switzerland Over the Last Day</b></h3>"""
 map.get_root().html.add_child(folium.Element(titel_html))
 
-# add the new corona cases over the last day for each canton to the map
+# add the new corona cases over the last day for each canton to the map, exclude cantons which had no cases
 for i in range(0, len(cantons)):
-    folium.CircleMarker(location=[coordinates_cantons.iloc[i]["latitude"], coordinates_cantons.iloc[i]["longitude"]], radius=(today.iloc[i]/20), popup=today.index[i]+": " +str(today[i]), color="#cc4131", fill=True, fill_color="#cc4131").add_to(map)
+    if today[i] != 0:
+        folium.CircleMarker(location=[coordinates_cantons.iloc[i]["latitude"], coordinates_cantons.iloc[i]["longitude"]], radius=(today.iloc[i]/20), popup=today.index[i]+": " +str(today[i]), color="#cc4131", fill=True, fill_color="#cc4131").add_to(map)
 
 # save the map as html file named "Geographical map of new cases visualization.html" in the project
 map.save("Geographical map of new cases visualization.html")
