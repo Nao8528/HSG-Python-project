@@ -1,4 +1,4 @@
-# HSG-Python Project on Corona Datasets
+# HSG-Python Project on SARS-CoV-2 data
 
 The following project visualizes the past corona data for Switzerland and allows for an up-to-date monitoring of the pandemic 
 in this country. This project was written by Yu-Lun and Stephanie Frey from the University of St. Gallen and worked fine
