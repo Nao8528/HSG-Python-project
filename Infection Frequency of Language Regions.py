@@ -1,9 +1,14 @@
-# This file visualizes all new cases on a map of Switzerland
+# This file visualizes the infection frequency of the three language regions of Switzerland
+# These language regions include the german- / italian- and french-speaking part of Switzerland
+# This clustering can provide useful information, since these three language regions are three social groups with high
+# mobility within the social group and less mobility across the three social groups
 # Import all necessary libraries
 import numpy as np
 import pandas as pd
-import folium
-from folium import plugins
+import random
+from random import randint
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 # Import all corona datasets
 AG = pd.read_csv(
@@ -89,40 +94,35 @@ Confirmed_cases['Whole Switzerland'] = Confirmed_cases.apply(lambda x: x.sum(), 
 new_confirmed_cases = Confirmed_cases.diff()
 new_confirmed_cases=new_confirmed_cases.fillna(0)
 
-# Third - add new dataframe including all the canton coordinates, this is needed to visualize the data on the map
-# The canton coordinates are made up of latitude and longitude of the capital of each canton
-latitude_cantons=[46.84986, 46.94809, 47.39254, 47.33103, 47.38615, 47.48455, 47.55839, 46.80237, 46.20222, 47.04057,
-                  47.36493, 47.05048, 46.99179, 46.95805, 46.89611, 47.42391, 47.69732, 47.20791, 47.02076, 47.55776,
-                  46.19278, 46.88042, 46.516, 46.23343, 47.17242, 47.36667]
-longitude_cantons=[9.53287, 7.44744, 8.04422, 9.40996, 9.27916, 7.73446, 7.57327, 7.15128, 6.14569, 9.06804, 7.34453,
-                   8.30635, 6.931, 8.36609, 8.24531, 9.37477, 8.63493, 7.53714, 8.65414, 8.89893, 9.01703, 8.64441,
-                   6.63282, 7.34939, 8.51745, 8.556]
-coordinates_cantons=pd.DataFrame(index=cantons_namelist)
-coordinates_cantons["latitude"]=latitude_cantons
-coordinates_cantons["longitude"]=longitude_cantons
+# Third get the infection frequency for each language region
+# Cluster the data according to the three language regions: German, Italian and French (the roman part is not considered, as it makes up only 0.5% of the Swiss population)
+German_cantons = new_confirmed_cases.filter(items=["GR", "BE", "AG", "AI", "AR", "BL", "BS","GL", "JU", "LU","NW",
+                                                    "OW", "SG","SH", "SO", "SZ", "TG","UR","ZG", "ZH"])
+Italian_cantons = new_confirmed_cases.filter(items=["TI"])
+French_cantons = new_confirmed_cases.filter(items=["FR", "GE","NE","VD", "VS"])
 
-# After the data processing, the code to visualize the data on a map is added
-# The visualization only includes the new corona cases over the last day for each canton (data filtering)
-today=new_confirmed_cases.iloc[-1]
+# Collect the population size of the different language regions
+# The population size accoridng to the Swiss government is 8.6 million and the german-, italian- and french-speaking
+# make up 63%, 8% and 23% respectively
+Pop_German=8.6*1000000*0.63
+Pop_Italian=8.6*1000000*0.08
+Pop_French=8.6*1000000*0.23
 
-# A Map of Switzerland is created
-map=folium.Map(location=[46.8131873, 8.22421],
-               tiles="cartodbpositron",
-               zoom_start=8)
+# Calculate the relative infection frequency of the different language regions per 100'000
+German_frequency = German_cantons.sum(axis=1)/Pop_German*100000
+Italian_frequency = Italian_cantons.sum(axis=1)/Pop_Italian*100000
+French_frequency = French_cantons.sum(axis=1)/Pop_French*100000
 
-# A titel is added to the map
-titel_html="""<h3 align="center" style="font-size:20px"><b>New Corona Cases in Switzerland Over the Last Day</b></h3>"""
-map.get_root().html.add_child(folium.Element(titel_html))
+# Create a dataframe of all infection frequencies of the different language regions
+data= {"German":German_frequency,"Italian":Italian_frequency,"French":French_frequency}
+Infection_frequency = pd.concat(data, axis=1)
 
-# New corona cases over the last day for each canton is added to the map (cantons which had no cases over the last day are excluded)
-for i in range(0, len(cantons)):
-    if today[i] != 0:
-        folium.CircleMarker(location=[coordinates_cantons.iloc[i]["latitude"], coordinates_cantons.iloc[i]["longitude"]],
-                            radius=(today.iloc[i]/20),
-                            popup=today.index[i]+": " +str(today[i]),
-                            color="#cc4131",
-                            fill=True,
-                            fill_color="#cc4131").add_to(map)
+# The following code is concerned with the visualization part
+# Each language region is coded with one color using a dictionary
+language_regions=["German", "Italian", "French"]
+color_code = []
+random.seed(1000)
+for i in range(len(language_regions)):
+    color_code.append('#%06X' % randint(0, 0xFFFFFF))
 
-# The Map is saved in the project as a html file named "Geographical Map of New Cases.html"
-map.save("Geographical Map of New Cases.html")
+colors = dict(zip(language_regions, color_code))
