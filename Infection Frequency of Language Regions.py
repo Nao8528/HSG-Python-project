@@ -5,9 +5,11 @@
 # Import all necessary libraries
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 import random
 from random import randint
-import bar_chart_race as bcr
+from matplotlib import cm
+
 
 # Import all corona datasets
 AG = pd.read_csv(
@@ -116,15 +118,22 @@ French_frequency = French_cantons.sum(axis=1)/Pop_French*100000
 data= {"German":German_frequency,"Italian":Italian_frequency,"French":French_frequency}
 Infection_frequency = pd.concat(data, axis=1)
 
-# The following code is concerned with the visualization part
-# Each language region is coded with one color using a dictionary
-language_regions=["German", "Italian", "French"]
-color_code = []
-random.seed(1000)
-for i in range(len(language_regions)):
-    color_code.append('#%06X' % randint(0, 0xFFFFFF))
+datapoints = Infection_frequency.iloc[-1]
 
-colors = dict(zip(language_regions, color_code))
-
-# Bar chart race
-bcr.bar_chart_race(Infection_frequency)
+# Create a bar chart of current data
+fig, bar_chart=plt.subplots(figsize = (16,9))
+color=cm.inferno_r(np.linspace(.4,.8,3))
+datapoints.plot.barh(color=color)
+datapoints.sort_values(ascending=True, inplace=True)
+bar_chart.xaxis.grid(linestyle="--", linewidth=0.5)
+bar_chart.set_xlim(0,datapoints.max()*1.2)
+bar_chart.set_title("Infection Rate of the Language Regions in Switzerland", fontsize=18)
+bar_chart.set_xlabel("Infection Rate", weight="bold")
+bar_chart.set_yticklabels(y_labels)
+bar_chart.set_axisbelow(True)
+for pos in ["top","right","bottom","left"]:
+    bar_chart.spines[pos].set_linewidth(0.5)
+    bar_chart.spines[pos].set_color("grey")
+for Y,X in enumerate(datapoints.values):
+    bar_chart.annotate("{:,}".format(X), xy=(X,Y),)
+plt.show()
