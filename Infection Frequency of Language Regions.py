@@ -7,8 +7,7 @@ import numpy as np
 import pandas as pd
 import random
 from random import randint
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+import bar_chart_race as bcr
 
 # Import all corona datasets
 AG = pd.read_csv(
@@ -126,3 +125,6 @@ for i in range(len(language_regions)):
     color_code.append('#%06X' % randint(0, 0xFFFFFF))
 
 colors = dict(zip(language_regions, color_code))
+
+# Bar chart race
+bcr.bar_chart_race(Infection_frequency)

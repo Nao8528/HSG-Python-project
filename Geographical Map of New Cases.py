@@ -124,5 +124,6 @@ for i in range(0, len(cantons)):
                             fill=True,
                             fill_color="#cc4131").add_to(map)
 
-# The Map is saved in the project as a html file named "Geographical Map of New Cases.html"
+# The Map is saved in the project as a html file named "Geographical Map of New Cases.html" (it can be opened in the Browser via PyCharm)
 map.save("Geographical Map of New Cases.html")
+map
