@@ -127,6 +127,7 @@ Infection_frequency=Infection_frequency_F.append([Infection_frequency_G, Infecti
 
 # Add another column to the dataframe containing the calendar week for animation in bar chart
 Infection_frequency["Calendar Week 2020"]=Infection_frequency["date"].dt.isocalendar().week
+Infection_frequency_week=Infection_frequency.groupby(["Swiss Language Region","Calendar Week 2020"],as_index=False).sum()
 
 # Plot an animated and interactive bar chart for the infection rates of the three language regions in 2020
 fig=px.bar(Infection_frequency, x="Swiss Language Region", y="Infection Frequency",
