@@ -6,7 +6,7 @@ This project was written by YuLun Chen (National ChengChi University in Taipei, 
 University of St. Gallen) and Stephanie Frey (University of St. Gallen).
 This project worked fine in PyCharm and ... by December 2020.
 
-The Project includes following elements:
+The Project includes the following elements:
 1. Bar chart of cummulative new corona cases over time. User can choose which canton to display and also view the whole of Switzerland
 2. Map of Switzerland visualizing the number of new Covid-19 infections over the past day for each Swiss canton. This graph is saved in the project to visualize in the Browser when using PyCharm
 3. Interactive animation of the infection frequency of the three main language clusters in Switzerland: french-,german-, and italian-speaking
