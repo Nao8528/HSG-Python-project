@@ -1,7 +1,10 @@
 # This file visualizes the infection frequency of the three language regions of Switzerland
-# These language regions include the german- / italian- and french-speaking part of Switzerland
+# These language regions include the german- / italian- and french-speaking part of Switzerland, the Rhaeto-Romanic part of Switzerland
+# is not looked at, since the population is small and displaying this fragmented region makes little sense in this context
 # This clustering can provide useful information, since these three language regions are three social groups with high
 # mobility within the social group and less mobility across the three social groups
+# Please note that this visualization displays only the year 2020 in an animated and interactive bar chart over time, year 2021 will not be displayed
+
 # Import all necessary libraries
 import numpy as np
 import pandas as pd
