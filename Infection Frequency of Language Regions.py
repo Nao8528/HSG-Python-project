@@ -114,30 +114,31 @@ Italian_frequency = Italian_cantons.sum(axis=1)/Pop_Italian*100000
 French_frequency = French_cantons.sum(axis=1)/Pop_French*100000
 
 # Create a dataframe of all infection frequencies of the different language regions
-Infection_frequency_F = pd.DataFrame(French_frequency, columns=["Infection Frequency"])
+Infection_frequency_F = pd.DataFrame(French_frequency, columns=["Infection Frequency / 100'000"])
 Infection_frequency_F["Swiss Language Region"] = "french-speaking"
 Infection_frequency_F.reset_index(inplace=True)
-Infection_frequency_G = pd.DataFrame(German_frequency, columns=["Infection Frequency"])
+Infection_frequency_G = pd.DataFrame(German_frequency, columns=["Infection Frequency / 100'000"])
 Infection_frequency_G["Swiss Language Region"]="german-speaking"
 Infection_frequency_G.reset_index(inplace=True)
-Infection_frequency_I = pd.DataFrame(Italian_frequency, columns=["Infection Frequency"])
+Infection_frequency_I = pd.DataFrame(Italian_frequency, columns=["Infection Frequency / 100'000"])
 Infection_frequency_I["Swiss Language Region"]="italian-speaking"
 Infection_frequency_I.reset_index(inplace=True)
 Infection_frequency=Infection_frequency_F.append([Infection_frequency_G, Infection_frequency_I])
 
 # Add another column to the dataframe containing the calendar week for animation in bar chart
-Infection_frequency["Calendar Week 2020"]=Infection_frequency["date"].dt.isocalendar().week
+Infection_frequency["Calendar Week"]=Infection_frequency["date"].dt.isocalendar().week
 Infection_frequency["Calendar year"]=Infection_frequency["date"].dt.isocalendar().year
-Infection_frequency_week=Infection_frequency.groupby(["Swiss Language Region","Calendar year","Calendar Week 2020"],as_index=False).sum()
-Infection_frequency_week["time year-week"]=Infection_frequency_week["Calendar year"].astype("str")+" "+"week"+" "+Infection_frequency_week["Calendar Week 2020"].astype("str")
+Infection_frequency_week=Infection_frequency.groupby(["Swiss Language Region","Calendar year","Calendar Week"],as_index=False).sum()
+Infection_frequency_week["Time: Year-Week"]=Infection_frequency_week["Calendar year"].astype("str")+"-"+Infection_frequency_week["Calendar Week"].astype("str")
 
 
 # Plot an animated and interactive bar chart for the infection rates of the three language regions in 2020
-fig=px.bar(Infection_frequency_week, x="Swiss Language Region", y="Infection Frequency",
+
+fig=px.bar(Infection_frequency_week, x="Swiss Language Region", y="Infection Frequency / 100'000",
            color="Swiss Language Region", color_discrete_sequence=px.colors.qualitative.T10,
-           title="Infection Frequency of the Language Regions in Switzerland 2020",
-           animation_frame="time year-week",
+           title="Infection Frequency of the Language Regions in Switzerland per 100'000 people",
+           animation_frame="Time: Year-Week",
            animation_group="Swiss Language Region",
-           range_y=[0,250])
+           range_y=[0,Infection_frequency_week["Infection Frequency / 100'000"].max()*1.05])
 fig.update_layout(showlegend=False)
 fig.show()
