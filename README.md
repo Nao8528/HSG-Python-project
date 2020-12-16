@@ -1,17 +1,17 @@
 # HSG-Python Project on SARS-CoV-2 data
 
-The following project visualizes the past corona data for Switzerland and allows for an up-to-date monitoring of the pandemic 
-in this country. This project was written by Yu-Lun ... and Stephanie Frey from the University .... and 
-University of St. Gallen and worked fine on PyCharm and ... by December 2020.
+The following project visualizes the past corona data for Switzerland and allows for an up-to-date monitoring
+of the pandemic. Data is updated regularly and the code is written to capture new data points.
+This project was written by YuLun Chen (National ChengChi University in Taipei, exchange student at the
+University of St. Gallen) and Stephanie Frey (University of St. Gallen).
+This project worked fine in PyCharm and ... by December 2020.
 
 The Project includes following elements:
-Firstly, the new corona cases are visualized over time in a bar chart. 
-The output includes a bar chart of the data for the whole of Switzerland and of data for selected cantons.
-Secondly, the new corona cases are visualized on a map of Switzerland.
-This map shows the new corona cases over the last day.
-Thirdly, the timeseries of the reproduction number of Switzerland is plotted on a line graph with reference to R = 1.
-Finally, random forest is used to predict the new corona cases and the quality of the model is visualized on a 
-line graph displaying the predicted and actual values.
+1. Bar chart of cummulative new corona cases over time. User can choose which canton to display and also view the whole of Switzerland
+2. Map of Switzerland visualizing the number of new Covid-19 infections over the past day for each Swiss canton. This graph is saved in the project to visualize in the Browser when using PyCharm
+3. Interactive animation of the infection frequency of the three main language clusters in Switzerland: french-,german-, and italian-speaking
+4. Line graph of the timeseries of the reproduction number (R) for Switzerland, with reference to R = 1
+5. Using random forest, new Covid-19 infections are predicted and compared with actual values in a line graph
 
 Information about the data used in this project:
 The SARS-CoV-2 data is collected from an open government datasets for SARS-CoV-2 related data reported by the 
