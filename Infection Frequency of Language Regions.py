@@ -5,11 +5,7 @@
 # Import all necessary libraries
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
-import random
-from random import randint
-from matplotlib import cm
-
+import plotly.express as px
 
 # Import all corona datasets
 AG = pd.read_csv(
@@ -115,25 +111,26 @@ Italian_frequency = Italian_cantons.sum(axis=1)/Pop_Italian*100000
 French_frequency = French_cantons.sum(axis=1)/Pop_French*100000
 
 # Create a dataframe of all infection frequencies of the different language regions
-data= {"German":German_frequency,"Italian":Italian_frequency,"French":French_frequency}
-Infection_frequency = pd.concat(data, axis=1)
+Infection_frequency_F = pd.DataFrame(French_frequency, columns=["Infection Frequency"])
+Infection_frequency_F["Swiss Language Region"] = "french-speaking"
+Infection_frequency_F.reset_index(inplace=True)
+Infection_frequency_G = pd.DataFrame(German_frequency, columns=["Infection Frequency"])
+Infection_frequency_G["Swiss Language Region"]="german-speaking"
+Infection_frequency_G.reset_index(inplace=True)
+Infection_frequency_I = pd.DataFrame(Italian_frequency, columns=["Infection Frequency"])
+Infection_frequency_I["Swiss Language Region"]="italian-speaking"
+Infection_frequency_I.reset_index(inplace=True)
+Infection_frequency=Infection_frequency_F.append([Infection_frequency_G, Infection_frequency_I])
 
-datapoints = Infection_frequency.iloc[-1]
+# Add another column to the dataframe containing the calendar week for animation in bar chart
+Infection_frequency["Calendar Week 2020"]=Infection_frequency["date"].dt.isocalendar().week
 
-# Create a bar chart of current data
-fig, bar_chart=plt.subplots(figsize = (16,9))
-color=cm.inferno_r(np.linspace(.4,.8,3))
-datapoints.plot.barh(color=color)
-datapoints.sort_values(ascending=True, inplace=True)
-bar_chart.xaxis.grid(linestyle="--", linewidth=0.5)
-bar_chart.set_xlim(0,datapoints.max()*1.2)
-bar_chart.set_title("Infection Rate of the Language Regions in Switzerland", fontsize=18)
-bar_chart.set_xlabel("Infection Rate", weight="bold")
-bar_chart.set_yticklabels(y_labels)
-bar_chart.set_axisbelow(True)
-for pos in ["top","right","bottom","left"]:
-    bar_chart.spines[pos].set_linewidth(0.5)
-    bar_chart.spines[pos].set_color("grey")
-for Y,X in enumerate(datapoints.values):
-    bar_chart.annotate("{:,}".format(X), xy=(X,Y),)
-plt.show()
+# Plot an animated and interactive bar chart for the infection rates of the three language regions in 2020
+fig=px.bar(Infection_frequency, x="Swiss Language Region", y="Infection Frequency",
+           color="Swiss Language Region", color_discrete_sequence=px.colors.qualitative.T10,
+           title="Infection Frequency of the Language Regions in Switzerland 2020",
+           animation_frame="Calendar Week 2020",
+           animation_group="Swiss Language Region",
+           range_y=[0,250])
+fig.update_layout(showlegend=False)
+fig.show()
