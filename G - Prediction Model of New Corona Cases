@@ -1,14 +1,12 @@
-# This file visualizes the infection frequency of the three language regions of Switzerland
-# These language regions include the german- / italian- and french-speaking part of Switzerland, the Rhaeto-Romanic part of Switzerland
-# is not looked at, since the population is small and displaying this fragmented region makes little sense in this context
-# This clustering can provide useful information, since these three language regions are three social groups with high
-# mobility within the social group and less mobility across the three social groups
-# Please note that this visualization displays only the year 2020 in an animated and interactive bar chart over time, year 2021 will not be displayed
+# This file includes machine learning to predict the new corona cases using random forest
 
-# Import all necessary libraries
+# Import all relevant modules
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plotly.express as px
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
 
 # Import all corona datasets
 AG = pd.read_csv(
@@ -63,17 +61,19 @@ ZG = pd.read_csv(
     "https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_kanton_total_csv_v2/COVID19_Fallzahlen_Kanton_ZG_total.csv")
 ZH = pd.read_csv(
     "https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_kanton_total_csv_v2/COVID19_Fallzahlen_Kanton_ZH_total.csv")
+R_numbers = pd.read_csv(
+    "https://raw.githubusercontent.com/covid-19-Re/dailyRe-Data/master/CHE-estimates.csv")
 
-# Data processing:
-cantons = [GR, BE, AG, AI, AR, BL, BS, FR, GE, GL, JU, LU, NE, NW, OW, SG, SH, SO, SZ, TG, TI, UR, VD, VS, ZG, ZH]
-cantons_namelist = ["GR", "BE", "AG", "AI", "AR", "BL", "BS", "FR", "GE", "GL", "JU", "LU", "NE", "NW", "OW", "SG",
+# Data processing - combine whole data from different datasets
+cantons = [GE, GR, BE, AG, AI, AR, BL, BS, FR, GL, JU, LU, NE, NW, OW, SG, SH, SO, SZ, TG, TI, UR, VD, VS, ZG, ZH]
+cantons_namelist = ["GE", "GR", "BE", "AG", "AI", "AR", "BL", "BS", "FR", "GL", "JU", "LU", "NE", "NW", "OW", "SG",
                     "SH", "SO", "SZ", "TG", "TI", "UR", "VD", "VS", "ZG", "ZH"]
 
 # Merge all cumulated cases by each canton and calculate new confirmed cases day by day
-# First-merge data by "ncumul_conf" and create a dataframe including all the confirmed cases for each canton
+# First - merge data by "ncumul_conf" and create a dataframe including all the confirmed cases for each canton
 for i in range(0, len(cantons)):
     cantons[i].index = cantons[i]["date"]
-    Confirmed_cases = pd.DataFrame(np.random.randn(len(GR.index), 1), index=GR.index)
+    Confirmed_cases = pd.DataFrame(np.random.randn(len(GE.index), 1), index=GE.index)
 
 for i in range(0, len(cantons)):
     Confirmed_cases = pd.merge(Confirmed_cases, cantons[i]["ncumul_conf"].to_frame(), on="date", how="left")
@@ -90,55 +90,74 @@ Confirmed_cases = Confirmed_cases.fillna(method='ffill')
 # Add data of whole Switzerland to the dataframe
 Confirmed_cases['Whole Switzerland'] = Confirmed_cases.apply(lambda x: x.sum(), axis=1)
 
-# Second-caculate new confirmed cases day by day
+# Second - caculate new confirmed cases day by day
 new_confirmed_cases = Confirmed_cases.diff()
-new_confirmed_cases=new_confirmed_cases.fillna(0)
 
-# Third get the infection frequency for each language region
-# Cluster the data according to the three language regions: German, Italian and French (the roman part is not considered, as it makes up only 0.5% of the Swiss population)
-German_cantons = new_confirmed_cases.filter(items=["GR", "BE", "AG", "AI", "AR", "BL", "BS","GL", "JU", "LU","NW",
-                                                    "OW", "SG","SH", "SO", "SZ", "TG","UR","ZG", "ZH"])
-Italian_cantons = new_confirmed_cases.filter(items=["TI"])
-French_cantons = new_confirmed_cases.filter(items=["FR", "GE","NE","VD", "VS"])
+# Create a new dataframe for the recovered cases
+for i in range(0,len(cantons)):
+    cantons[i].index=cantons[i]["date"]
+    recover=pd.DataFrame(np.random.randn(len(GE.index),1),index=GE.index)
 
-# Collect the population size of the different language regions
-# The population size accoridng to the Swiss government is 8.6 million and the german-, italian- and french-speaking
-# make up 63%, 8% and 23% respectively
-Pop_German=8.6*1000000*0.63
-Pop_Italian=8.6*1000000*0.08
-Pop_French=8.6*1000000*0.23
+for i in range(0,len(cantons)):
+    recover=pd.merge(recover,cantons[i]["ncumul_released"].to_frame(),on="date",how="left")
+    recover.rename(columns={"ncumul_released":cantons_namelist[i]},inplace=True)
 
-# Calculate the relative infection frequency of the different language regions per 100'000
-German_frequency = German_cantons.sum(axis=1)/Pop_German*100000
-Italian_frequency = Italian_cantons.sum(axis=1)/Pop_Italian*100000
-French_frequency = French_cantons.sum(axis=1)/Pop_French*100000
+recover=recover.drop(columns=[0])
 
-# Create a dataframe of all infection frequencies of the different language regions
-Infection_frequency_F = pd.DataFrame(French_frequency, columns=["Infection Frequency / 100'000"])
-Infection_frequency_F["Swiss Language Region"] = "french-speaking"
-Infection_frequency_F.reset_index(inplace=True)
-Infection_frequency_G = pd.DataFrame(German_frequency, columns=["Infection Frequency / 100'000"])
-Infection_frequency_G["Swiss Language Region"]="german-speaking"
-Infection_frequency_G.reset_index(inplace=True)
-Infection_frequency_I = pd.DataFrame(Italian_frequency, columns=["Infection Frequency / 100'000"])
-Infection_frequency_I["Swiss Language Region"]="italian-speaking"
-Infection_frequency_I.reset_index(inplace=True)
-Infection_frequency=Infection_frequency_F.append([Infection_frequency_G, Infection_frequency_I])
+# Set the date as index of the dataframe
+recover.index = pd.to_datetime(recover.index)
 
-# Add another column to the dataframe containing the calendar week for animation in bar chart
-Infection_frequency["Calendar Week"]=Infection_frequency["date"].dt.isocalendar().week
-Infection_frequency["Calendar year"]=Infection_frequency["date"].dt.isocalendar().year
-Infection_frequency_week=Infection_frequency.groupby(["Swiss Language Region","Calendar year","Calendar Week"],as_index=False).sum()
-Infection_frequency_week["Time: Year-Week"]=Infection_frequency_week["Calendar year"].astype("str")+"-"+Infection_frequency_week["Calendar Week"].astype("str")
+# Use last day's data to fill in NA
+recover=recover.fillna(method='ffill')
+recover['Recover'] = recover.apply(lambda x: x.sum(), axis=1)
 
+# Data processing of R numbers
+R_numbers_ch=R_numbers[R_numbers["region"]=="CHE"]
+R_numbers_ch=R_numbers_ch[R_numbers_ch["data_type"]=="Confirmed cases"]
+R_numbers_ch=R_numbers_ch[R_numbers_ch["estimate_type"]=="Cori_step"]
+R_numbers_ch["date"]=pd.to_datetime(R_numbers_ch["date"])
+R_numbers_ch.index=R_numbers_ch["date"]
 
-# Plot an animated and interactive bar chart for the infection rates of the three language regions in 2020
+# Merge all the control variables and depend variables
+test=pd.merge(new_confirmed_cases["Whole Switzerland"].to_frame(),R_numbers_ch["median_R_mean"].to_frame(),on="date",how="left")
+test=pd.merge(test,recover["Recover"].to_frame(),on="date",how="left")
+test=pd.merge(test,Confirmed_cases["Whole Switzerland"].to_frame(),on="date",how="left")
+test=test[test.index>="2020-02-26"]
+test=test[R_numbers_ch["date"][-1]>=test.index]
+test.rename(columns={"Whole Switzerland_x":"New_Confirmed_cases","Whole Switzerland_y":"Cumulated_Confirmed_Cases"},inplace=True)
 
-fig=px.bar(Infection_frequency_week, x="Swiss Language Region", y="Infection Frequency / 100'000",
-           color="Swiss Language Region", color_discrete_sequence=px.colors.qualitative.T10,
-           title="Infection Frequency of the Language Regions in Switzerland per 100'000 people",
-           animation_frame="Time: Year-Week",
-           animation_group="Swiss Language Region",
-           range_y=[0,Infection_frequency_week["Infection Frequency / 100'000"].max()*1.05])
-fig.update_layout(showlegend=False)
-fig.show()
+# Use random forest for the prediction
+# Split data into testing model and training model
+X = test.drop('New_Confirmed_cases',axis=1)
+y = test['New_Confirmed_cases']
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.3,random_state=101)
+
+# Fit
+rf=RandomForestRegressor(n_estimators = 1000, random_state = 101)
+rf.fit(X_train, y_train)
+
+# Use the forest's predict method on the test data
+predictions = rf.predict(X_test)
+
+# Calculate the absolute errors
+errors = abs(predictions - y_test)
+
+# Print out the Mean Absolute Error (MAE)
+print('Mean Absolute Error:', round(np.mean(errors), 2), 'degrees.')
+
+# Plot the graph which shows the actual and the predicted values
+a=pd.DataFrame(predictions.astype(float),index=y_test.index)
+a=a.sort_values("date")
+b=y_test.to_frame().sort_values("date")
+results=pd.merge(a,b,on="date",how="left")
+results.rename(columns={0:"Prediction","New_Confirmed_cases":"Actual"},inplace=True)
+plt.subplots(1,1,figsize=(18,9))
+plt.plot(results.index,results["Prediction"],color="blue")
+plt.plot(results.index,results["Actual"],color="red")
+plt.xticks(rotation=45)
+plt.title("Actual vs Predicted New Covid-19 Infections",fontsize=15)
+red_patch=mpatches.Patch(color="red", label="Actual")
+blue_patch=mpatches.Patch(color="blue", label="Prediction")
+plt.legend(handles=[red_patch, blue_patch])
+plt.grid()
+plt.show()

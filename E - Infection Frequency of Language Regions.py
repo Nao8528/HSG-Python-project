@@ -1,9 +1,13 @@
-# This file visualizes all new cases on a map of Switzerland
+# This animated and interactive visualization displays the the infection frequency per 100'000 over time of the three Swiss language regions. The infection frequency is cumulative over one calendar week
+# These language regions include the german- / italian- and french-speaking part of Switzerland, the Rhaeto-Romanic part of Switzerland
+# is not separately considered, since its population is small (only about 0.5% of the Swiss population) and displaying this fragmented region makes little sense in this context
+# This type of clustering can provide useful information, since these three language regions are three social groups with high
+# mobility within and less mobility across the social groups, due to language barriers
+
 # Import all necessary libraries
 import numpy as np
 import pandas as pd
-import folium
-from folium import plugins
+import plotly.express as px
 
 # Import all corona datasets
 AG = pd.read_csv(
@@ -59,7 +63,7 @@ ZG = pd.read_csv(
 ZH = pd.read_csv(
     "https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_kanton_total_csv_v2/COVID19_Fallzahlen_Kanton_ZH_total.csv")
 
-# Data processing:
+# Data processing - combine whole data from different datasets
 cantons = [GR, BE, AG, AI, AR, BL, BS, FR, GE, GL, JU, LU, NE, NW, OW, SG, SH, SO, SZ, TG, TI, UR, VD, VS, ZG, ZH]
 cantons_namelist = ["GR", "BE", "AG", "AI", "AR", "BL", "BS", "FR", "GE", "GL", "JU", "LU", "NE", "NW", "OW", "SG",
                     "SH", "SO", "SZ", "TG", "TI", "UR", "VD", "VS", "ZG", "ZH"]
@@ -89,41 +93,49 @@ Confirmed_cases['Whole Switzerland'] = Confirmed_cases.apply(lambda x: x.sum(), 
 new_confirmed_cases = Confirmed_cases.diff()
 new_confirmed_cases=new_confirmed_cases.fillna(0)
 
-# Third - add new dataframe including all the canton coordinates, this is needed to visualize the data on the map
-# The canton coordinates are made up of latitude and longitude of the capital of each canton
-latitude_cantons=[46.84986, 46.94809, 47.39254, 47.33103, 47.38615, 47.48455, 47.55839, 46.80237, 46.20222, 47.04057,
-                  47.36493, 47.05048, 46.99179, 46.95805, 46.89611, 47.42391, 47.69732, 47.20791, 47.02076, 47.55776,
-                  46.19278, 46.88042, 46.516, 46.23343, 47.17242, 47.36667]
-longitude_cantons=[9.53287, 7.44744, 8.04422, 9.40996, 9.27916, 7.73446, 7.57327, 7.15128, 6.14569, 9.06804, 7.34453,
-                   8.30635, 6.931, 8.36609, 8.24531, 9.37477, 8.63493, 7.53714, 8.65414, 8.89893, 9.01703, 8.64441,
-                   6.63282, 7.34939, 8.51745, 8.556]
-coordinates_cantons=pd.DataFrame(index=cantons_namelist)
-coordinates_cantons["latitude"]=latitude_cantons
-coordinates_cantons["longitude"]=longitude_cantons
+# Then get the infection frequency for each language region
+# Cluster the data according to the three language regions: German, Italian and French
+German_cantons = new_confirmed_cases.filter(items=["GR", "BE", "AG", "AI", "AR", "BL", "BS","GL", "JU", "LU","NW",
+                                                    "OW", "SG","SH", "SO", "SZ", "TG","UR","ZG", "ZH"])
+Italian_cantons = new_confirmed_cases.filter(items=["TI"])
+French_cantons = new_confirmed_cases.filter(items=["FR", "GE","NE","VD", "VS"])
 
-# After the data processing, the code to visualize the data on a map is added
-# The visualization only includes the new corona cases over the last day for each canton (data filtering)
-today=new_confirmed_cases.iloc[-1]
+# Collect the population size of the different language regions
+# The population size accoridng to the Swiss government is 8.6 million
+# The german-, italian- and french-speaking part make up 63%, 8% and 23% respectively
+Pop_German=8.6*1000000*0.63
+Pop_Italian=8.6*1000000*0.08
+Pop_French=8.6*1000000*0.23
 
-# A Map of Switzerland is created
-map=folium.Map(location=[46.8131873, 8.22421],
-               tiles="cartodbpositron",
-               zoom_start=8)
+# Calculate the relative infection frequency of the different language regions per 100'000
+German_frequency = German_cantons.sum(axis=1)/Pop_German*100000
+Italian_frequency = Italian_cantons.sum(axis=1)/Pop_Italian*100000
+French_frequency = French_cantons.sum(axis=1)/Pop_French*100000
 
-# A titel is added to the map
-titel_html="""<h3 align="center" style="font-size:20px"><b>New Corona Cases in Switzerland Over the Last Day</b></h3>"""
-map.get_root().html.add_child(folium.Element(titel_html))
+# Create a dataframe of all infection frequencies of the different language regions
+Infection_frequency_F = pd.DataFrame(French_frequency, columns=["Infection Frequency / 100'000"])
+Infection_frequency_F["Swiss Language Region"] = "french-speaking"
+Infection_frequency_F.reset_index(inplace=True)
+Infection_frequency_G = pd.DataFrame(German_frequency, columns=["Infection Frequency / 100'000"])
+Infection_frequency_G["Swiss Language Region"]="german-speaking"
+Infection_frequency_G.reset_index(inplace=True)
+Infection_frequency_I = pd.DataFrame(Italian_frequency, columns=["Infection Frequency / 100'000"])
+Infection_frequency_I["Swiss Language Region"]="italian-speaking"
+Infection_frequency_I.reset_index(inplace=True)
+Infection_frequency=Infection_frequency_F.append([Infection_frequency_G, Infection_frequency_I])
 
-# New corona cases over the last day for each canton is added to the map (cantons which had no cases over the last day are excluded)
-for i in range(0, len(cantons)):
-    if today[i] != 0:
-        folium.CircleMarker(location=[coordinates_cantons.iloc[i]["latitude"], coordinates_cantons.iloc[i]["longitude"]],
-                            radius=(today.iloc[i]/20),
-                            popup=today.index[i]+": " +str(today[i]),
-                            color="#cc4131",
-                            fill=True,
-                            fill_color="#cc4131").add_to(map)
+# Add another column to the dataframe containing the calendar week and year for animation over time in the bar chart
+Infection_frequency["Calendar Week"]=Infection_frequency["date"].dt.isocalendar().week
+Infection_frequency["Calendar year"]=Infection_frequency["date"].dt.isocalendar().year
+Infection_frequency_week=Infection_frequency.groupby(["Swiss Language Region","Calendar year","Calendar Week"],as_index=False).sum()
+Infection_frequency_week["Time: Year-Week"]=Infection_frequency_week["Calendar year"].astype("str")+"-"+Infection_frequency_week["Calendar Week"].astype("str")
 
-# The Map is saved in the project as a html file named "Geographical Map of New Cases.html" (it can be opened in the Browser via PyCharm)
-map.save("Geographical Map of New Cases.html")
-map
+# Plot an animated and interactive bar chart of the infection rates per 100'000 people over time
+fig=px.bar(Infection_frequency_week, x="Swiss Language Region", y="Infection Frequency / 100'000",
+           color="Swiss Language Region", color_discrete_sequence=px.colors.qualitative.T10,
+           title="Infection Frequency of the Language Regions in Switzerland per 100'000 people",
+           animation_frame="Time: Year-Week",
+           animation_group="Swiss Language Region",
+           range_y=[0,Infection_frequency_week["Infection Frequency / 100'000"].max()*1.05])
+fig.update_layout(showlegend=False)
+fig.show()

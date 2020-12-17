@@ -1,14 +1,9 @@
-# This file includes the code for the data processing of the corona datasets
-# This code is the basis for the different visualization techniques of this project
+# This file includes the code for the data processing of all the datasets including the corona data for the different Swiss cantons
+# This code is the basis for the different visualization techniques of this project and will be used in various other files of the project
+
 # Import all relevant modules
 import numpy as np
 import pandas as pd
-import matplotlib as mlt
-import datetime as dt
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter
-import matplotlib.dates as mdates
 
 # Import all corona datasets
 AG = pd.read_csv(
@@ -64,7 +59,7 @@ ZG = pd.read_csv(
 ZH = pd.read_csv(
     "https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_kanton_total_csv_v2/COVID19_Fallzahlen_Kanton_ZH_total.csv")
 
-# Data processing:
+# Data processing - combine whole data from different datasets
 cantons = [GR, BE, AG, AI, AR, BL, BS, FR, GE, GL, JU, LU, NE, NW, OW, SG, SH, SO, SZ, TG, TI, UR, VD, VS, ZG, ZH]
 cantons_namelist = ["GR", "BE", "AG", "AI", "AR", "BL", "BS", "FR", "GE", "GL", "JU", "LU", "NE", "NW", "OW", "SG",
                     "SH", "SO", "SZ", "TG", "TI", "UR", "VD", "VS", "ZG", "ZH"]
@@ -92,3 +87,6 @@ Confirmed_cases['Whole Switzerland'] = Confirmed_cases.apply(lambda x: x.sum(), 
 
 # Second - caculate new confirmed cases day by day
 new_confirmed_cases = Confirmed_cases.diff()
+
+# Print summary of the data
+print(new_confirmed_cases.describe())
