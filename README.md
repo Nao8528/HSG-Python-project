@@ -17,7 +17,7 @@ G. Using random forest, new Covid-19 infections are predicted and compared with 
 
 Information about the data used in this project:
 The SARS-CoV-2 data is collected from an open government datasets for SARS-CoV-2 related data reported by the Swiss Cantons and the Principality of Liechtenstein.
-This data is generated and validated daily using manual and automated procedures. The data was collected from 26.02.2020 onwards.
+This data is generated and validated daily using manual and automated procedures. We use the data from 26.02.2020 onwards.
 Note that the data includes only reported information by the Swiss Cantons and the Principality of Liechtenstein. Thus, gaps result if Swiss Cantons or the 
 Principality of Liechtenstein do not report data for the specific date or report the data later on.
 Link to the datasets: https://github.com/openZH/covid_19
