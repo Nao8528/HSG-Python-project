@@ -4,7 +4,7 @@ The following project visualizes the past corona data for Switzerland and allows
 Data is updated regularly and the code is written to capture new data points.
 This project was written by YuLun Chen (National ChengChi University in Taipei, exchange student at the University of St. Gallen) 
 and Stephanie Frey (University of St. Gallen). This project worked fine in PyCharm by 17. December 2020.
-There is no specific sequence for running this project, files can be run separately and will work on independently.
+There is no specific sequence for running this project, files can be run separately and will work independently.
 
 The Project includes the following elements:
 A. A file including the data processing of the corona data for each canton. At the end a summary of the data is printed
