@@ -118,7 +118,7 @@ R_numbers_ch=R_numbers_ch[R_numbers_ch["estimate_type"]=="Cori_step"]
 R_numbers_ch["date"]=pd.to_datetime(R_numbers_ch["date"])
 R_numbers_ch.index=R_numbers_ch["date"]
 
-# Merge all the control variables and depend variables
+# Merge all the control variables and depend variables and use data from 26 February onwards
 test=pd.merge(new_confirmed_cases["Whole Switzerland"].to_frame(),R_numbers_ch["median_R_mean"].to_frame(),on="date",how="left")
 test=pd.merge(test,recover["Recover"].to_frame(),on="date",how="left")
 test=pd.merge(test,Confirmed_cases["Whole Switzerland"].to_frame(),on="date",how="left")

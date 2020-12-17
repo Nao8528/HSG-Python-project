@@ -1,4 +1,4 @@
-# This file visualizes the reproduction rate of Switzerland over time
+# This file visualizes the reproduction rate of Switzerland over time with reference R = 1
 
 # Import all necessary libraries
 import matplotlib.patches as mpatches

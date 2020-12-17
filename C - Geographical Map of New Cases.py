@@ -1,6 +1,6 @@
 # This file visualizes all new cases cumulative over the past day on a map of Switzerland
 # The user is allowed to zoom in and out. In addition the number of new cases will popup as soon as the user clicks on a canton
-# This map will be saved in the project "D - Geographical Map of New Cases.html" and can be opened using the browser
+# This map will be saved in the project as "D - Geographical Map of New Cases.html" and can also be opened using the browser
 
 # Import all necessary libraries
 import numpy as np
