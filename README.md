@@ -1,9 +1,9 @@
-# HSG-Python Project on SARS-CoV-2 data - by YuLun Chen and Stephanie Frey
+# HSG-Python Project on SARS-CoV-2 Data - by YuLun Chen and Stephanie Frey
 
 The following project visualizes the past corona data for Switzerland and allows for an up-to-date monitoring of the pandemic. 
 Data is updated regularly and the code is written to capture new data points.
 This project was written by YuLun Chen (National ChengChi University in Taipei, exchange student at the University of St. Gallen) 
-and Stephanie Frey (University of St. Gallen). This project worked fine in PyCharm and ... by December 2020.
+and Stephanie Frey (University of St. Gallen). This project worked fine in PyCharm by 17. December 2020.
 There is no specific sequence for running this project, files can be run separately and will work on independently.
 
 The Project includes the following elements:
@@ -11,7 +11,7 @@ A. A file including the data processing of the corona data for each canton. At t
 B. Bar chart of cumulative new Covid-19 cases over time. User can choose which canton to display and also view the whole of Switzerland
 C. Map of Switzerland visualizing the number of new Covid-19 infections over the past day for each Swiss canton. This graph is saved in the project and can also be visualize using the Browser (helpful when using PyCharm)
 D. HTML File of the code in C. - can be opened using the browser and can serve as comparison to last day (in that case, must be saved before running the program)
-E. Interactive animation of the infection frequency per 100'000 (cumulative over one calendar week) of the three main language clusters in Switzerland: french-,german-, and italian-speaking regions
+E. Interactive animation of the infection frequency per 100'000 (cumulative over one calendar week) of the three main language clusters in Switzerland: french-, german-, and italian-speaking regions
 F. Line graph displaying the timeseries of the reproduction number (R) for Switzerland, with reference to R = 1
 G. Using random forest, new Covid-19 infections are predicted and compared with actual values in a line graph
 
